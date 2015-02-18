@@ -10,8 +10,20 @@ get '/texts' do
   json result_ary
 end
 
-get '/keywords' do
-    results = `curl -HContent-Type:application/json 'http://localhost:8080/nlp/service/nlp/processDocument/?apiKey=TST&lang=en' -d '#{quiddity input}' |  jq '.enrichments.keyPhrases | .[] | select(.relevance > 0.5) | .phrase'`
+get '/text' do
+  result = `curl -s 'http://api.diffbot.com/v3/article?token=846be86562ff0fd57ca95c44e973ca15&url=#{params[:url]}'`
+  STDERR.puts result
+  result_obj = JSON.parse(result)
+  result_ary = result_obj['objects'][0]['text'].gsub(/\n/, ' ').gsub(/ +/, '%20').gsub(/'/, '')
+  URI::Escape result_ary
+end
+
+post '/keywords' do
+    STDERR.puts params.inspect
+    text = params[:text]
+    text.gsub!( /'|"|\n/, ' ' )
+    STDERR.puts "curl -HContent-Type:application/json 'http://localhost:8080/nlp/service/nlp/processDocument/?apiKey=TST&lang=en' -d '#{quiddity text}' |  jq '.enrichments.keyPhrases | .[] | select(.relevance > 0.5) | .phrase'"
+    results = `curl -v -HContent-Type:application/json 'http://localhost:8080/nlp/service/nlp/processDocument/?apiKey=TST&lang=en' -d '#{quiddity text}' |  jq '.enrichments.keyPhrases | .[] | select(.relevance > 0.5) | .phrase'`
     results_ary = []
     results.split( /\n/ ).each do |e|
       e.gsub!(/"/, '')
@@ -21,7 +33,8 @@ get '/keywords' do
 end
 
 get '/results' do
-    
+  rune = `echo '#{params[:query]}' | brumm/fh-bools | brumm/fh-ranged | brumm/fh-views -l listview`
+  results = `curl -XPOST http://fh-stage-c.meltwater.net/searchservice/  -HContentType:application/json -d '#{rune}`
 end
 
 def quiddity input

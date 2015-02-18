@@ -135,7 +135,7 @@
                                         </div>
 
                                         <h3>Search results</h3>
-                                        <div style="padding-left: 20px">
+                                        <div id=search_results" style="padding-left: 20px">
                                             <div style="margin-bottom: 10px">
                                                 <h4>Title</h4>
                                                 <div>Now for anyone who says that whisper is inefficient because it does tiny writes, perhaps they should understand the software they are attempting to use before deploying it. Whisper is more or less RRD, but allowing backfilling old data. Lots and lots of tiny writes are how the software it replaced worked and how it is meant to work. That being said, there have been several pull requests to batch the writes so that where possible, it has less of an IO penalty. However, you fundamentally need to understand how to troubleshoot a Linux system and tune a system / hardware for the application running on it. I can't stress that enough.</div>
@@ -227,7 +227,7 @@
                 var container = $("#keywordsContainer");
                 $.ajax({
                     url: "../keywords",
-                    data: data,
+                    data: { "text" : data },
                     type: "POST",
                     success: function(data, status, jqXHR){
 
@@ -237,7 +237,8 @@
                     }
                 });
                 return false;
-            });
+                });
+
 
 
 		}
