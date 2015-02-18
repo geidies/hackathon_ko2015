@@ -1,0 +1,249 @@
+<div class="row">
+	<div class="col-xs-12 col-sm-7 col-md-7 col-lg-4">
+		<h1 class="page-title txt-color-blueDark"><i class="fa fa-pencil-square-o fa-fw "></i> Wizard</h1>
+	</div>
+</div>
+
+<!-- widget grid -->
+<section id="widget-grid" class="">
+
+	<!-- row -->
+	<div class="row">
+
+		<!-- NEW WIDGET START -->
+		<article class="col-sm-12 col-md-12 col-lg-12">
+
+			<!-- Widget ID (each widget will need unique ID)-->
+			<div class="jarviswidget" id="wid-id-2" data-widget-editbutton="false" data-widget-deletebutton="false">
+				<header>
+					<h2> Wizard </h2>
+
+				</header>
+
+				<!-- widget div-->
+				<div>
+
+					<!-- widget edit box -->
+					<div class="jarviswidget-editbox">
+						<!-- This area used as dropdown edit box -->
+
+					</div>
+					<!-- end widget edit box -->
+
+					<!-- widget content -->
+					<div class="widget-body fuelux">
+
+						<div class="wizard">
+							<ul class="steps">
+								<li data-target="#step1" class="active">
+									<span class="badge badge-info">1</span>Step 1<span class="chevron"></span>
+								</li>
+								<li data-target="#step2">
+									<span class="badge">2</span>Step 2<span class="chevron"></span>
+								</li>
+								<li data-target="#step3">
+									<span class="badge">3</span>Step 3<span class="chevron"></span>
+								</li>
+							</ul>
+							<div class="actions">
+								<button type="button" class="btn btn-sm btn-primary btn-back">
+									<i class="fa fa-arrow-left"></i>Prev
+								</button>
+								<button type="button" class="btn btn-sm btn-success btn-next" data-last="Finish">
+									Next<i class="fa fa-arrow-right"></i>
+								</button>
+							</div>
+						</div>
+						<div class="step-content">
+							<form class="form-horizontal" id="fuelux-wizard" method="post">
+
+								<div class="step-pane active" id="step1">
+									<h3><strong>Step 1 </strong> - Search</h3>
+
+									<!-- wizard form starts here -->
+									<fieldset>
+
+										<div class="form-group">
+											<label class="col-md-2 control-label"></label>
+											<div class="col-md-8">
+												<div class="input-group">
+													<input id="urlField" placeholder="www.atlascopco.us" class="form-control" type="text">
+													<span class="input-group-addon"><i class="fa fa-search"></i></span>
+												</div>
+												<!--<span class="help-block">Something may have gone wrong</span>-->
+											</div>
+                                            <div class="col-md-2">
+                                                <button id="searchByUrl" class="btn btn-primary">
+                                                    Search
+                                                </button>
+                                            </div>
+										</div>
+									</fieldset>
+                                    <footer>
+
+                                    </footer>
+								</div>
+
+								<div class="step-pane" id="step2">
+									<h3><strong>Step 2 </strong> - Extracted text</h3>
+                                    <fieldset>
+
+                                        <div class="form-group">
+                                            <label class="col-md-1 control-label"></label>
+                                            <div class="col-md-10">
+                                                <div id="extractedTextsContainer" class="input-group">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                    <footer>
+                                        <button type="button" id="step2submit" class="btn btn-primary">
+                                            Submit
+                                        </button>
+                                        <button type="button" class="btn btn-default btn-back">
+                                            Back
+                                        </button>
+                                    </footer>
+								</div>
+
+								<div class="step-pane" id="step3">
+									<h3><strong>Step 3 </strong> - Suggested keywords</h3>
+                                    <fieldset>
+
+                                        <div class="form-group">
+                                            <label class="col-md-1 control-label"></label>
+                                            <div class="col-md-10">
+                                                <div id="keywordsContainer" class="input-group">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <h3>Generated boolean expression</h3>
+                                        <div class="form-group">
+                                            <label class="col-md-1 control-label"></label>
+                                            <div class="col-md-10">
+                                                <div class="input-group">
+                                                    <label class="label">Textarea</label>
+                                                    <label class="textarea" style="width: 100%">
+                                                        <textarea rows="3" cols="100" style="width: 100%"></textarea>
+                                                    </label>
+                                                    <!--<div class="note">-->
+                                                        <!--<strong>Note:</strong> height of the textarea depends on the rows attribute.-->
+                                                    <!--</div>-->
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <h3>Search results</h3>
+                                        <div style="padding-left: 20px">
+                                            <div style="margin-bottom: 10px">
+                                                <h4>Title</h4>
+                                                <div>Now for anyone who says that whisper is inefficient because it does tiny writes, perhaps they should understand the software they are attempting to use before deploying it. Whisper is more or less RRD, but allowing backfilling old data. Lots and lots of tiny writes are how the software it replaced worked and how it is meant to work. That being said, there have been several pull requests to batch the writes so that where possible, it has less of an IO penalty. However, you fundamentally need to understand how to troubleshoot a Linux system and tune a system / hardware for the application running on it. I can't stress that enough.</div>
+                                            </div>
+                                            <div>
+                                                <h4>Title</h4>
+                                                <div>Now for anyone who says that whisper is inefficient because it does tiny writes, perhaps they should understand the software they are attempting to use before deploying it. Whisper is more or less RRD, but allowing backfilling old data. Lots and lots of tiny writes are how the software it replaced worked and how it is meant to work. That being said, there have been several pull requests to batch the writes so that where possible, it has less of an IO penalty. However, you fundamentally need to understand how to troubleshoot a Linux system and tune a system / hardware for the application running on it. I can't stress that enough.</div>
+                                            </div>
+                                        </div>
+
+                                    </fieldset>
+								</div>
+
+
+
+
+							</form>
+						</div>
+
+					</div>
+					<!-- end widget content -->
+
+				</div>
+				<!-- end widget div -->
+
+			</div>
+			<!-- end widget -->
+
+		</article>
+		<!-- WIDGET END -->
+
+	</div>
+
+	<!-- end row -->
+
+</section>
+<!-- end widget grid -->
+
+<script type="text/javascript">
+	pageSetUp();
+
+	var pagefunction = function() {
+
+		loadScript("js/plugin/fuelux/wizard/wizard.min.js", fueluxWizard);
+
+        function buildCheckbox(container, array){
+            $.each(array, function(i, data){
+                $("<label>", {
+                    class: "checkbox"
+                }).append(
+                        $("<input>", {
+                            id: "text" + i,
+                            type: "checkbox",
+                            name: "checkbox" + i,
+                            checked: "checked"
+                        }),
+                        $("<span>", {
+                            text: data
+                        }))
+                        .appendTo(container);
+
+            })
+        }
+
+		function fueluxWizard() {
+
+			var wizard = $('.wizard').wizard();
+
+            $("#searchByUrl").on("click", function(){
+                var url = $("#urlField").val();
+                $.getJSON("../texts", "url=" + url, function(_data){
+                    var container = $("#extractedTextsContainer");
+                    container.empty();
+                    buildCheckbox(container, _data);
+                    $('.wizard').wizard("next")
+                });
+                return false;
+            });
+
+            $(".btn-back").on("click", function(){
+                $('.wizard').wizard("previous")
+            });
+
+            $("#step2submit").on("click", function(){
+                var data = "";
+                $.each($("#extractedTextsContainer").find("input:checked").parent().find("span"), function(i, input){
+                    data += $(input).text() + "\n"
+                });
+                var container = $("#keywordsContainer");
+                $.ajax({
+                    url: "../keywords",
+                    data: data,
+                    type: "POST",
+                    success: function(data, status, jqXHR){
+
+                        buildCheckbox(container, data);
+
+                        $('.wizard').wizard("next")
+                    }
+                });
+                return false;
+            });
+
+
+		}
+
+	};
+
+	pagefunction();
+
+</script>

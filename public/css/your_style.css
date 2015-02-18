@@ -1,0 +1,123 @@
+/*
+ * It is advised not to edit the smartadmin_production.css
+ * as this will override any changes you make in the 
+ * later versions of this theme. 
+ * 
+ * We advise that you use use this CSS to override 
+ * SmartAdmin styles. 
+ * 
+ * Rename the stylesheet to whatever your liking so it will stay
+ * unique to you with each update of SmartAdmin.
+ */
+
+/*
+ * INDEX
+ * 
+ * - HTML
+ * - BODY
+ * - CUSTOM STYLES
+ */
+
+
+.cubismChart svg {
+    font: 10px sans-serif;
+}
+
+.axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+/*q:before,*/
+/*blockquote:before {*/
+    /*content: "“";*/
+/*}*/
+
+/*q:after,*/
+/*blockquote:after {*/
+    /*content: "”";*/
+/*}*/
+
+/*blockquote:before {*/
+    /*position: absolute;*/
+    /*left: 2em;*/
+/*}*/
+
+/*blockquote:after {*/
+    /*position: absolute;*/
+/*}*/
+
+.axis {
+    font: 10px sans-serif;
+}
+
+.axis text {
+    -webkit-transition: fill-opacity 250ms linear;
+}
+
+.axis path {
+    display: none;
+}
+
+.axis line {
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.horizon {
+    border-bottom: solid 1px #000;
+    overflow: hidden;
+    position: relative;
+}
+
+.horizon {
+    border-top: solid 1px #000;
+    border-bottom: solid 1px #000;
+}
+
+.horizon + .horizon {
+    border-top: none;
+}
+
+.horizon canvas {
+    display: block;
+}
+
+.horizon .title,
+.horizon .value {
+    bottom: 0;
+    line-height: 30px;
+    margin: 0 6px;
+    position: absolute;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
+    white-space: nowrap;
+}
+
+.horizon .title {
+    left: 0;
+}
+
+.horizon .value {
+    right: 0;
+}
+
+.line {
+    background: #000;
+    opacity: .2;
+    z-index: 2;
+}
+
+.cubismChart {
+    height: inherit;
+}
+
+.no-wrap {
+    white-space: nowrap;
+}
+
+
+.dataTables_length, .dataTables_length label{
+    width: 100%
+}
+
