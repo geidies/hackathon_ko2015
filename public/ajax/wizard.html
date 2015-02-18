@@ -217,7 +217,7 @@
                 $("#booleanExpression").text("");
                 $.ajax({
                     url: "../keywords",
-                    data: data,
+                    data: { "text" : data },
                     type: "POST",
                     success: function(data, status, jqXHR){
 
