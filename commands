@@ -14,3 +14,6 @@ echo '{"field": "body.title.text", "value":"KEY PHRASE", "type": "word"}' | brum
 
 # Boolean to searchservice request (NOTE: brumm branch: fh_wilds)
 echo 'BOOLEAN QUERY' | brumm/fh-bools | brumm/fh-ranged | brumm/fh-views -l listview
+
+# Do a search towards staging based on a runes query
+curl -XPOST http://fh-stage-c.meltwater.net/searchservice/  -HContentType:application/json <RUNES QUERY AS DATA>
