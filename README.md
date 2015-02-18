@@ -1,3 +1,10 @@
+Prerequisites
+=============
+
+    bundle install
+    bundle exec ruby app.rb
+
+
 Endpoints
 =========
 
