@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'yajl'
+require 'date' 
+require 'optparse'
+
+def parse_opts(args)
+  options = {}
+  opt_parser = OptionParser.new do |opts|
+    opts.banner = "Usage: fhq [options]"
+    opts.on_tail("-h", "--help", "Show this message") do
+      puts opts
+      exit
+    end
+
+  end
+  opt_parser.parse(args)
+  options
+end
+
+def wildcard(field, value)
+  {:type => 'wildcard', :field => field, :value => value.strip }
+end
+
+def query_for(text, opts)
+  fields = ['body.title.text', 'body.content.text', 'body.ingress.text']
+  {
+    :type => 'any',
+    :anyQueries => fields.map {|field| wildcard(field, text)}
+  }
+end
+
+opts = parse_opts(ARGV)
+while STDIN.gets
+  puts Yajl.dump(query_for($_, opts))
+end
+

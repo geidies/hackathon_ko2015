@@ -1,0 +1,137 @@
+#! /usr/bin/env ruby
+
+require 'rubygems'
+require 'optparse'
+require 'yajl'
+
+
+
+def query(input)
+  if(input.is_a? String)
+    input.to_q
+  else
+    input
+  end
+end
+
+class Array
+  def any_q
+    any(self.map{|q|query(q)})
+  end
+  def all_q
+    all(self.map{|q|query(q)})
+  end
+end
+
+class String
+  def to_q; all_text(self) end
+  def and(*other) 
+    all(([self] + other).map{|q|query(q)})
+  end
+  def or(*other) 
+    any(([self] + other).map{|q|query(q)})
+  end
+  def not(other) 
+    not_q(query(self),query(other))
+  end
+end
+
+class Hash
+  def and(*other) 
+    all(([self] + other).map{|q|query(q)})
+  end
+  def or(*other) 
+    any(([self] + other).map{|q|query(q)})
+  end
+  def not(other) 
+    not_q(query(self),query(other))
+  end
+end
+
+def not_q(match,notMatch)
+  {
+    :type => "not",
+    :matchQuery => match,
+    :notMatch => notMatch
+  }
+end
+
+def all_text(value)
+  any([
+    "body.title.text",
+    "body.ingress.text",
+    "body.ingress.text"
+  ].map{|field| wc(field, value)})
+end
+
+def all(queries)
+  {
+    :type => "all",
+    :allQueries => queries
+  }
+end
+
+def any(queries)
+  {
+    :type => "any",
+    :anyQueries => queries
+  }
+end
+
+def wc(field, text)
+  {
+    :type => "wildcard",
+    :field => field,
+    :value => text
+  }
+end
+
+def title(text)
+  wc('body.title.text', text)
+end
+
+def ingress(text)
+  wc('body.ingress.text', text)
+end
+
+def content(text)
+  wc('body.content.text', text)
+end
+
+def parse_opts(args)
+  options = {}
+  parser = OptionParser.new do | opts |
+    opts.banner = "hest [options]"
+    opts.on("-e", "--execute SCRIPT", "Script to execute") do | script | 
+      options[:mode] = :exec
+      options[:script] = script
+    end
+    opts.on("-n", "--lines", "Script to execute") do
+      options[:mode] = :lines
+    end
+  end
+  parser.parse! args
+  if(! args.empty?)
+    options[:mode] = :file
+    options[:files] = args
+  end
+  options
+end
+
+opts = parse_opts(ARGV)
+case opts[:mode]
+when :exec
+  puts Yajl.dump(query(eval(opts[:script])))
+when :lines
+  ARGF.each do |line|
+    puts Yajl.dump(query(eval(line)))
+  end
+when :file
+  opts[:files].each do | file |
+    File.open(file, 'r') { |f| puts Yajl.dump(query(eval(f.read))) }
+  end
+end
+
+
+
+

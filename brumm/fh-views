@@ -1,0 +1,142 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'yajl'
+require 'net/http'
+require 'optparse'
+
+def parse_opts(args)
+  urlAliases = {
+    'prod' => 'http://mag-fh-searchservice.osl.basefarm.net:8080/searchservice/',
+    'staging' => 'http://fh-stage-c.meltwater.net/searchservice/',
+    'local'   => 'http://localhost:8080/search-service/',
+    'forward'   => 'http://localhost:8080/searchservice/'
+  }
+  options = {
+    :url => urlAliases['local'], 
+    :cache => 'noCache',
+    :views => {:count => {:type => 'count'}}
+  }
+  opt_parser = OptionParser.new do |opts|
+    opts.banner = "Usage: fhq [options]"
+    opts.on("-u", "--url URL", "Which url to search against.") do |url|
+      if urlAliases.key? url
+        options[:url] = urlAliases[url]
+      else
+        options[:url] = url
+      end
+    end
+    opts.on("-c", "--cache CACHE", "Specify if you want to cache.") do |val|
+      if ["yes", "y", "true"].any?{|x| x == val}
+        options[:cache] = "fromCache"
+      elsif ["no", "n", "false"].any?{|x| x == val}
+        options[:cache] = "noCache"
+      else
+        options[:cache] = val
+      end
+    end
+    opts.on("-t", "--terms-facet FACET", "Applies a terms facet on the field") do | facet |
+      facet = parse_facet(facet)
+      options[:views][facet[:termsField].split('.')[-1]] = facet
+    end
+    opts.on("-l", "--result-list LIST", "Asks for a result list") do | list |
+      options[:views]['list'] = parse_list(list)
+    end
+    opts.on("-s", "--sorted-list LIST", "Asks for a sorted result list") do | list |
+      options[:views]['list'] = parse_sorted_list(list)
+    end
+    opts.on("-h", "--hamming-grouped-sorted-list LIST", "Asks for a grouped sorted result list") do | list |
+      options[:views]['list'] = parse_group_sorted_list(list)
+    end
+  end
+  opt_parser.parse(args)
+  options
+end
+
+def parse_group_sorted_list(spec)
+  sorted = parse_sorted_list(spec)
+  ret = {
+    :type => "sortedGroupedResultList",
+    :fields => sorted[:fields],
+    :numToGroup => 300,
+    :threshold => 0.9,
+    :similarityType => {:type => "max", :similarities => [{:type => "charikarHamming", :field => "enrichments.charikarLSH"}]},
+    :baseSortDirectives => sorted[:sortDirectives],
+    :hitSortDirectives => sorted[:sortDirectives],
+    :groupSortDirectives => sorted[:sortDirectives],
+    :highlightOptions => highlightOptions()
+  }
+  if sorted[:size]
+    ret[:size] = sorted[:size]
+  end
+  ret
+end
+
+def parse_list(spec)
+  if (spec.include? ':')
+    split = spec.split ':'
+    {:type => 'resultList', :size => split[0], :fields => comma_parse(split[1]), :highlightOptions => highlightOptions()}
+  else
+    {:type => 'resultList', :fields => comma_parse(spec), :highlightOptions => highlightOptions()}
+  end
+end
+
+def parse_sorted_list(spec)
+  split = spec.split ':'
+  directive = parse_directive(split[0])
+  if(split.length >= 3)
+    {:type => 'sortedResultList', :sortDirectives=> [directive], :size => split[1], :fields => comma_parse(split[2]), :highlightOptions => highlightOptions()}
+  else
+    { :type => 'sortedResultList', :sortDirectives => [directive], :size => 10, :fields => [], :highlightOptions => highlightOptions()} 
+  end
+end
+
+def highlightOptions()
+  {
+    :'body.title.text' => highlightField(), :'body.content.text' => highlightField(), :'body.ingress.text' => highlightField()
+  }
+end
+
+def highlightField()
+  {:numberOfFragments => 10, :preTag => "<em>", :fragmentSize => 140, :strictFragmentSize => true, :postTag => "</em>", :strictFragmentSize => false}
+end
+
+def comma_parse(spec)
+  spec.split(',') || [split]
+end
+
+def parse_directive(spec)
+  if spec.start_with? '-'
+    {:sortOrder => :desc, :sortField => spec[1..-1]}
+  else
+    {:sortOrder => :asc, :sortField => spec}
+  end
+end
+
+def parse_facet(spec)
+  if (spec.include? ':')
+    split = spec.split ':'
+    {:type => 'termsFacet', :termsField => split[0], :size => split[1]}
+  else
+     {:type => 'termsFacet', :termsField => spec }
+  end
+end
+
+def to_req(query, options)
+  {
+    :query => query,
+    :cacheDirective => {:type => options[:cache]},
+    :viewRequests => options[:views]
+  }
+end
+
+def do_request(options)
+  lambda do | query |
+    puts Yajl.dump(to_req(query, options))
+  end
+end
+
+$stdout.sync = true
+parser = Yajl::Parser.new({:symbolize_keys => true})
+parser.on_parse_complete = do_request(parse_opts(ARGV))
+parser.parse(STDIN)
+

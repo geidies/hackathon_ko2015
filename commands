@@ -1,0 +1,16 @@
+
+# Send to NLP
+./nlp_util.py -lang en -doc atlascorpo.json -cmd send | jq . >> enriched.json
+
+OR
+
+curl -XPOST http://localhost:8070/nlp/service/nlp/processDocument/?apiKey=TST&lang=en  -HContentType:application/json --data @atlascorpo.json
+
+# Get relevant key phrases
+<enriched.json  jq '.enrichments.keyPhrases | .[] | select(.relevance >0.5) | .phrase'
+
+# Get searchservice request for count for a key phrase
+echo '{"field": "body.title.text", "value":"KEY PHRASE", "type": "word"}' | brumm/fh-ranged | brumm/fh-views
+
+# Boolean to searchservice request (NOTE: brumm branch: fh_wilds)
+echo 'BOOLEAN QUERY' | brumm/fh-bools | brumm/fh-ranged | brumm/fh-views -l listview
