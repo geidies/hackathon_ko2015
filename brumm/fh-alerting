@@ -1,0 +1,84 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'yajl'
+require 'net/http'
+require 'optparse'
+
+def parse_opts(args)
+  urlAliases = {
+    'local'   => 'http://localhost:8080/alerting-service/subscriptions',
+    'forward'   => 'http://localhost:8080/alertingservice/subscriptions'
+  }
+  options = {
+    :url => urlAliases['local'],
+    :group => 'brumm',
+    :privateGroups => ['default_group'],
+    :highlightOptions => highlightOptions()
+  }
+  opt_parser = OptionParser.new do |opts|
+    opts.banner = "Usage: fhq [options]"
+    opts.on("-u", "--url URL", "Which url to register alerts against.") do |url|
+      if urlAliases.key? url
+        options[:url] = urlAliases[url]
+      else
+        options[:url] = url
+      end
+    end
+    opts.on("-g", "--group-name STRING", "The group that the alert belongs to") do | group |
+      options[:group] = group
+    end
+    opts.on("-p", "--private-group LIST", "The private goups that belong to the alert") do | groups |
+      options[:privateGroups] = groups
+    end
+  end
+  opt_parser.parse(args)
+  options
+end
+
+def highlightOptions()
+  {
+    :'body.title.text' => highlightField(), :'body.content.text' => highlightField(), :'body.ingress.text' => highlightField()
+  }
+end
+
+def highlightField()
+  {:numberOfFragments => 1, :preTag => "<em>", :fragmentSize => 140, :strictFragmentSize => true, :postTag => "</em>", :strictFragmentSize => false}
+end
+
+def to_req(query, options)
+  {
+    :query => query,
+    :id => (0...22).map { (65 + rand(26)).chr }.join,
+    :group => options[:group],
+    :privateGroups => options[:privateGroups],
+    :highlightOptions => options[:highlightOptions]
+  }
+end
+
+def do_request(options)
+  lambda do | query |
+    uri = URI(options[:url])
+    headers = {
+      "Content-Type" => "application/json",
+      "Accept" => "application/json"
+    }
+    Net::HTTP.start(uri.host, uri.port) do | http | 
+      start = Time.now
+      req = Net::HTTP::Put.new(uri.path, initheader = headers)
+      req.body = Yajl.dump(to_req(query, options))
+      print req
+      http.request req do | res |
+        took = (Time.now - start) * 1000
+        ret = Yajl.load(res.body, {:symbolize_keys => true})
+        ret[:took] = took
+        puts Yajl.dump(ret)
+      end
+    end
+  end
+end
+
+$stdout.sync = true
+parser = Yajl::Parser.new({:symbolize_keys => true})
+parser.on_parse_complete = do_request(parse_opts(ARGV))
+parser.parse(STDIN)
+

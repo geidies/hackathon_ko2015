@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+JAVA_OPTS="$JAVA_OPTS -Xmx256M"
+java $JAVA_OPTS -cp $BASEDIR/libs/rabbit-tools.jar com.meltwater.fairhair.brumm.rabbit.RabbitWriter $@
+

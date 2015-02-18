@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'yajl'
+require 'date' 
+require 'optparse'
+
+def parse_opts(args)
+  options = {:type => "news"}
+  opt_parser = OptionParser.new do |opts|
+    opts.banner = "Usage: fhq [options]"
+    opts.on("-t", "--type TYPE", "Which media type to search for") do |type|
+      options[:type] = type
+    end
+    opts.on_tail("-h", "--help", "Show this message") do
+      puts opts
+      exit
+    end
+
+  end
+  opt_parser.parse(args)
+  options
+end
+
+def with_media_type(query, opts)
+  {
+    :type => 'all',
+    :allQueries => [
+      query,
+      {
+        :type => 'term', 
+        :field => 'metaData.mediaType',
+        :value => opts[:type], 
+      }
+    ]
+  }
+end
+
+def print_media_type(opts)
+  lambda do | query |
+    puts Yajl.dump(with_media_type(query, opts))
+  end
+end
+
+parser = Yajl::Parser.new({:symbolize_keys => true})
+parser.on_parse_complete = print_media_type(parse_opts(ARGV))
+parser.parse(STDIN)
+

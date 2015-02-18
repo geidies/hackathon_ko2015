@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'yajl'
+require 'net/http'
+require 'optparse'
+
+def parse_opts(args)
+  urlAliases = {
+    'prod' => 'http://mag-fh-searchservice.osl.basefarm.net:8080/searchservice/score/',
+    'staging' => 'http://fh-stage-c.meltwater.net/searchservice/score',
+    'local'   => 'http://localhost:8080/search-service/score/',
+    'forward'   => 'http://localhost:8080/searchservice/score/'
+  }
+  options = {
+    :url => urlAliases['local'], 
+  }
+
+  opt_parser = OptionParser.new do |opts|
+    opts.banner = "Usage: fhq"
+    opts.on("-u", "--url URL", "Which url to search against.") do |url|
+      if urlAliases.key? url
+        options[:url] = urlAliases[url]
+      else
+        options[:url] = url
+      end
+    end
+  end
+  opt_parser.parse(args)
+  options
+end
+
+def do_request(options)
+  lambda do | query |
+    uri = URI(options[:url])
+    headers = {
+      "Content-Type" => "application/json",
+      "Accept" => "application/json"
+    }
+    Net::HTTP.start(uri.host, uri.port) do | http | 
+      start = Time.now
+      req = Net::HTTP::Post.new(uri.path, initheader = headers)
+      req.body = Yajl.dump(query)
+      http.request req do | res |
+        took = (Time.now - start) * 1000
+        ret = Yajl.load(res.body, {:symbolize_keys => true})
+        ret[:took] = took
+        puts Yajl.dump(ret)
+      end
+    end
+  end
+end
+
+$stdout.sync = true
+parser = Yajl::Parser.new({:symbolize_keys => true})
+parser.on_parse_complete = do_request(parse_opts(ARGV))
+parser.parse(STDIN)
+

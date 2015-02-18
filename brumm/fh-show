@@ -1,0 +1,65 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'yajl'
+require 'date'
+
+class String
+  def black;          "\033[30m#{self}\033[0m" end
+  def red;            "\033[31m#{self}\033[0m" end
+  def green;          "\033[32m#{self}\033[0m" end
+  def brown;          "\033[33m#{self}\033[0m" end
+  def blue;           "\033[34m#{self}\033[0m" end
+  def magenta;        "\033[35m#{self}\033[0m" end
+  def cyan;           "\033[36m#{self}\033[0m" end
+  def gray;           "\033[37m#{self}\033[0m" end
+end
+
+def print_q(q)
+  q.each do | name, val|
+    if val.is_a?(Hash)
+      print_q(val)
+    elsif !name.to_s.start_with?('_')
+      out = (name.to_s.end_with? ("date")) ? DateTime.strptime((val/1000).to_s, '%s').strftime("%Y-%m-%d %H:%M:%S UTC"):val;
+      printf "%-20s %s\n", "#{name.to_s.blue}:", out.to_s.red
+    end
+  end
+end
+
+def print_list(list)
+  print "Hits:\n\n"
+  list[:results].each do | hit |
+    print_q(hit[:quiddity])
+    printf "\n"
+  end
+end
+
+def print_terms(key, view)
+  print "Counts for #{key.to_s.red}:\n\n"
+  view[:counts].each { |value, count |
+    printf "%s %s\n", "#{value.to_s.blue}:", count.to_s.red
+  }
+end
+
+def do_print()
+  lambda do | input |
+    printf "\nTook: %s ms to find %s results.\n", input[:took].to_s.green, input[:views][:count][:totalCount].to_s.red
+    print "\n" +  ("-" * 80).gray + "\n" * 2
+    input[:views].each { | name, view | 
+      case view[:type]
+      when "count"
+        next
+      when "resultList"
+        print_list(view)
+      when "termsFacet"
+        print_terms(name, view)
+      end
+      print "\n" +  ("-" * 80).gray + "\n" * 2
+    }
+  end
+end
+
+$stdout.sync = true
+parser = Yajl::Parser.new({:symbolize_keys => true})
+parser.on_parse_complete = do_print()
+parser.parse(STDIN)
+

@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'yajl'
+require 'date' 
+require 'optparse'
+
+def parse_opts(args)
+  options = {:to => DateTime.now, :from => (DateTime.now - 7)}
+  opt_parser = OptionParser.new do |opts|
+    opts.banner = "Usage: fhq [options]"
+    opts.on("-f", "--from FROM", "Which date to search from") do |from|
+      options[:from] = DateTime.parse(from)
+    end
+    opts.on("-t", "--to TO", "Which date to search to") do |to|
+      options[:to] = DateTime.parse(to)
+    end
+    opts.on_tail("-h", "--help", "Show this message") do
+      puts opts
+      exit
+    end
+
+  end
+  opt_parser.parse(args)
+  options
+end
+
+def with_ranges(query, opts)
+  {
+    :type => 'all',
+    :allQueries => [
+      query,
+      {
+        :type => 'range', 
+        :field => 'body.publishDate.date',
+        :from => opts[:from].strftime('%Q'), 
+        :to => opts[:to].strftime('%Q')
+      }
+    ]
+  }
+end
+
+def print_ranged(opts)
+  lambda do | query |
+    puts Yajl.dump(with_ranges(query, opts))
+  end
+end
+
+parser = Yajl::Parser.new({:symbolize_keys => true})
+parser.on_parse_complete = print_ranged(parse_opts(ARGV))
+parser.parse(STDIN)
+
