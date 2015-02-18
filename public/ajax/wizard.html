@@ -133,7 +133,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                     </fieldset>
 								</div>
 
@@ -213,6 +213,8 @@
                     data += $(input).text() + "\n"
                 });
                 var container = $("#keywordsContainer");
+                container.empty();
+                $("#booleanExpression").text("");
                 $.ajax({
                     url: "../keywords",
                     data: data,
